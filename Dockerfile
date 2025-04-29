@@ -1,14 +1,11 @@
-# Dockerfile
-
 FROM public.ecr.aws/lambda/python:3.11
 
 # Install dependencies
 COPY requirements.txt .
-RUN pip3 install --upgrade pip
-RUN pip3 install -r requirements.txt
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Copy the function code
+# Copy the Lambda function code
 COPY index.py ./
 
-# Set the CMD to your handler
+# Command for AWS Lambda to run the handler
 CMD ["index.lambda_handler"]
