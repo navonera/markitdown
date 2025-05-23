@@ -60,7 +60,7 @@ def lambda_handler(event, context):
                     },
                     ReturnValues="UPDATED_NEW"
                 )
-                print("✅ Successfully updated table with markdown content")
+                print("Successfully updated table with markdown content")
 
             except Exception as e:
                 print(f"Error updating table: {str(e)}")
