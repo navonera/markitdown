@@ -12,6 +12,7 @@ if not hasattr(os, "add_dll_directory"):
 
 s3 = boto3.client('s3')
 dynamodb = boto3.resource('dynamodb')
+sns = boto3.client('sns')
 
 def lambda_handler(event, context):
     try:
@@ -62,8 +63,23 @@ def lambda_handler(event, context):
                 )
                 print("Successfully updated table with markdown content")
 
+                # Publish to SNS topic
+                topic_name = f"global-resource-processed-{os.environ.get('STACK_NAME', 'default')}"
+                sns_message = {
+                    'fileHash': file_hash,
+                    'status': 'completed',
+                    'bucket': bucket,
+                    'key': key
+                }
+                
+                sns.publish(
+                    TopicArn=f"arn:aws:sns:{os.environ.get('AWS_REGION', 'eu-north-1')}:{os.environ.get('AWS_ACCOUNT_ID', '')}:{topic_name}",
+                    Message=json.dumps(sns_message)
+                )
+                print(f"Published to SNS topic: {topic_name}")
+
             except Exception as e:
-                print(f"Error updating table: {str(e)}")
+                print(f"Error updating table or publishing to SNS: {str(e)}")
                 raise e
 
         return {
