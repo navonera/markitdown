@@ -32,9 +32,6 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-        - name: Confirm ECR Login
-          run: docker info
-
 
       # 🏗️ Set up Docker Buildx
       - name: Set up Docker Buildx
