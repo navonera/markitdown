@@ -68,6 +68,9 @@ def lambda_handler(event, context):
 
                 # Publish to SNS topic
                 topic_name = f"global-resource-processed-{os.environ.get('STACK_NAME', 'default')}"
+                topic_arn = f"arn:aws:sns:{os.environ.get('AWS_REGION', 'eu-north-1')}:{aws_account_id}:{topic_name}"
+                print(f"Publishing to SNS Topic ARN: {topic_arn}")
+                
                 sns_message = {
                     'fileHash': file_hash,
                     'status': 'completed',
@@ -76,7 +79,7 @@ def lambda_handler(event, context):
                 }
                 
                 sns.publish(
-                    TopicArn=f"arn:aws:sns:{os.environ.get('AWS_REGION', 'eu-north-1')}:{aws_account_id}:{topic_name}",
+                    TopicArn=topic_arn,
                     Message=json.dumps(sns_message)
                 )
                 print(f"Published to SNS topic: {topic_name}")
