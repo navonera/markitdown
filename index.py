@@ -67,8 +67,10 @@ def lambda_handler(event, context):
                 print("Successfully updated table with markdown content")
 
                 # Publish to SNS topic
-                topic_name = f"global-resource-processed-{os.environ.get('STACK_NAME', 'default')}"
-                topic_arn = f"arn:aws:sns:{os.environ.get('AWS_REGION', 'eu-north-1')}:{aws_account_id}:{topic_name}"
+                topic_arn = os.environ.get('SNS_TOPIC_ARN')
+                if not topic_arn:
+                    raise ValueError("SNS_TOPIC_ARN environment variable is not set")
+                    
                 print(f"Publishing to SNS Topic ARN: {topic_arn}")
                 
                 sns_message = {
@@ -82,7 +84,7 @@ def lambda_handler(event, context):
                     TopicArn=topic_arn,
                     Message=json.dumps(sns_message)
                 )
-                print(f"Published to SNS topic: {topic_name}")
+                print(f"Published to SNS topic successfully")
 
             except Exception as e:
                 print(f"Error updating table or publishing to SNS: {str(e)}")
