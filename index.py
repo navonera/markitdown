@@ -17,7 +17,10 @@ sns = boto3.client('sns')
 def lambda_handler(event, context):
     try:
         print("Lambda started!")
-
+        # Get AWS account ID from Lambda context
+        aws_account_id = context.invoked_function_arn.split(':')[4]
+        print(f"AWS Account ID: {aws_account_id}")
+        
         for record in event.get('Records', []):
             print("Processing SQS message...")
             message = json.loads(record['body'])
@@ -73,7 +76,7 @@ def lambda_handler(event, context):
                 }
                 
                 sns.publish(
-                    TopicArn=f"arn:aws:sns:{os.environ.get('AWS_REGION', 'eu-north-1')}:{os.environ.get('AWS_ACCOUNT_ID', '')}:{topic_name}",
+                    TopicArn=f"arn:aws:sns:{os.environ.get('AWS_REGION', 'eu-north-1')}:{aws_account_id}:{topic_name}",
                     Message=json.dumps(sns_message)
                 )
                 print(f"Published to SNS topic: {topic_name}")
