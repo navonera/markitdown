@@ -13,7 +13,7 @@ jobs:
 
     env:
       AWS_REGION: us-east-1              # 🛠️ Update if using another region
-      ECR_REPOSITORY: pdf-to-markdown    # 🛠️ Your ECR repository name
+      ECR_REPOSITORY: pdf-conversion    # 🛠️ Your ECR repository name
 
     steps:
       # 🧾 Checkout your repo
