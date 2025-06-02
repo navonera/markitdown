@@ -6,12 +6,6 @@ import boto3
 from boto3.dynamodb.conditions import Key
 from markitdown import MarkItDown
 
-class DocumentConverterResult:
-    def __init__(self, text_content, title=None, markdown_content=None):
-        self.text_content = text_content
-        self.title = title
-        self.markdown_content = markdown_content or text_content
-
 # Safe fix for Windows DLL issues (ignored on Linux)
 if not hasattr(os, "add_dll_directory"):
     os.add_dll_directory = lambda x: None
@@ -46,22 +40,23 @@ def lambda_handler(event, context):
             pdf_bytes = response['Body'].read()
             print(f"Downloaded PDF size: {len(pdf_bytes)} bytes")
 
-            # Convert to markdown using local MarkItDown
+            # Convert to markdown
             pdf_stream = io.BytesIO(pdf_bytes)
             markitdown = MarkItDown()
             markdown_result = markitdown.convert_stream(pdf_stream)
-
             print("Available attributes in MarkItDown result:", dir(markdown_result))
 
-            # Get markdown content (assumes DocumentConverterResult now has markdown_content)
             markdown = markdown_result.markdown_content
             print("Generated Markdown:\n", markdown)
+
+
             print(f"Markdown output length: {len(markdown)} characters")
 
             # Update the DynamoDB table with markdown content and set status to completed
             try:
                 table_resource = dynamodb.Table(table)
 
+                # Update the record directly using fileHash as the primary key
                 response = table_resource.update_item(
                     Key={
                         'fileHash': file_hash
