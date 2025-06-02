@@ -46,7 +46,7 @@ def lambda_handler(event, context):
             markdown_result = markitdown.convert_stream(pdf_stream)
             print("Available attributes in MarkItDown result:", dir(markdown_result))
 
-            markdown = markdown_result.markdown_content
+            markdown = markdown_result.text_content
             print("Generated Markdown:\n", markdown)
 
 
