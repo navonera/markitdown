@@ -44,7 +44,8 @@ def lambda_handler(event, context):
             pdf_stream = io.BytesIO(pdf_bytes)
             markitdown = MarkItDown()
             markdown_result = markitdown.convert_stream(pdf_stream)
-            markdown = markdown_result.text_content
+            markdown = markdown_result.markdown_content
+            print("Generated Markdown:\n", markdown)
 
             print(f"Markdown output length: {len(markdown)} characters")
 
