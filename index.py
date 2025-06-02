@@ -17,6 +17,9 @@ sns = boto3.client('sns')
 def lambda_handler(event, context):
     try:
         print("Lambda started!")
+
+        print("MarkItDown version:", markitdown.__version__)
+
         # Get AWS account ID from Lambda context
         aws_account_id = context.invoked_function_arn.split(':')[4]
         print(f"AWS Account ID: {aws_account_id}")
