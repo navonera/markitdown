@@ -5,6 +5,7 @@ import base64
 import boto3
 from boto3.dynamodb.conditions import Key
 from markitdown import MarkItDown
+import markitdown # type: ignore
 
 # Safe fix for Windows DLL issues (ignored on Linux)
 if not hasattr(os, "add_dll_directory"):
@@ -45,8 +46,8 @@ def lambda_handler(event, context):
 
             # Convert to markdown
             pdf_stream = io.BytesIO(pdf_bytes)
-            markitdown = MarkItDown()
-            markdown_result = markitdown.convert_stream(pdf_stream)
+            converter  = MarkItDown()
+            markdown_result = converter.convert_stream(pdf_stream)
             print("Available attributes in MarkItDown result:", dir(markdown_result))
 
             markdown = markdown_result.text_content
