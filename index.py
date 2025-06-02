@@ -47,7 +47,7 @@ def lambda_handler(event, context):
             print("Available attributes in MarkItDown result:", dir(markdown_result))
 
             markdown = markdown_result.text_content
-            print("Generated Markdown:\n", markdown)
+            print("Generated Markdown:", markdown)
 
 
             print(f"Markdown output length: {len(markdown)} characters")
