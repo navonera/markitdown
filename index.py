@@ -13,7 +13,7 @@ s3 = boto3.client('s3')
 dynamodb = boto3.resource('dynamodb')
 sns = boto3.client('sns')
 
-SUPPORTED_EXTENSIONS = ['.pdf', '.docx', '.doc', '.html']
+SUPPORTED_EXTENSIONS = ['.pdf', '.docx', '.doc']
 
 def lambda_handler(event, context):
     try:
@@ -36,29 +36,41 @@ def lambda_handler(event, context):
             print(f"Table: {table}")
             print(f"File Hash: {file_hash}")
 
+            # Download file from S3
+            response = s3.get_object(Bucket=bucket, Key=key)
+            file_bytes = response['Body'].read()
+            content_type = response['ContentType']
+            print(f"Downloaded file size: {len(file_bytes)} bytes")
+            print(f"Detected MIME type: {content_type}")
+
             # Determine file extension
             file_extension = os.path.splitext(key)[1].lower()
             print(f"Detected file extension: {file_extension}")
 
-            if file_extension not in SUPPORTED_EXTENSIONS:
-                raise ValueError(f"Unsupported file type: {file_extension}")
+            # Validate supported file types
+            if file_extension in SUPPORTED_EXTENSIONS:
+                print("Processing with MarkItDown...")
+                file_stream = io.BytesIO(file_bytes)
+                markitdown = MarkItDown()
 
-            # Download file from S3
-            response = s3.get_object(Bucket=bucket, Key=key)
-            file_bytes = response['Body'].read()
-            print(f"Downloaded file size: {len(file_bytes)} bytes")
+                try:
+                    markdown_result = markitdown.convert_stream(file_stream)
+                    markdown = markdown_result.text_content
+                    print(f"Markdown output length: {len(markdown)} characters")
+                except Exception as e:
+                    print(f"Error during conversion: {str(e)}")
+                    raise e
 
-            # Convert to markdown using MarkItDown
-            file_stream = io.BytesIO(file_bytes)
-            markitdown = MarkItDown()
+            elif content_type.startswith("image/"):
+                raise ValueError("Image files are not supported for Markdown conversion.")
 
-            try:
-                markdown_result = markitdown.convert_stream(file_stream)
-                markdown = markdown_result.text_content
-                print(f"Markdown output length: {len(markdown)} characters")
-            except Exception as e:
-                print(f"Error during conversion: {str(e)}")
-                raise e
+            elif file_extension == '.document':
+                raise ValueError(
+                    "Unsupported file type '.document'. Please export Google Docs as .docx or .pdf before uploading."
+                )
+
+            else:
+                raise ValueError(f"Unsupported file type: {file_extension} ({content_type})")
 
             # Update the DynamoDB table
             try:
