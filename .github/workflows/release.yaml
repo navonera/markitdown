@@ -1,4 +1,4 @@
-name: Releae Image Navonera.COM
+name: Releae Image navonera.com
 
 on:
   workflow_dispatch:
