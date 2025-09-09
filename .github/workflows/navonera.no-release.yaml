@@ -1,4 +1,4 @@
-name: Releae Image Navonera.NO
+name: Releae Image navonera.no
 
 on:
   workflow_dispatch:
