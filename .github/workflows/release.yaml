@@ -1,4 +1,4 @@
-name: Build and Release Image
+name: Releae Image Navonera.COM
 
 on:
   workflow_dispatch:
